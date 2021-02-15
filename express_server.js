@@ -1,4 +1,3 @@
-const bootstrap = require('bootstrap');
 const express = require('express');
 const app = express();
 const PORT = 8080; 
@@ -25,6 +24,11 @@ app.get("/hello", (req, res) => {
 app.get("/urls", (req, res) => {
   const templateVars = { urls: "urlDatabase" };
   res.render("urls_index", templateVars);
+});
+
+app.get("/urls/:shortURL", (req, res) => {
+  const templateVars = { shortURL: req.params.shortURL, longURL: req.params.longURL };
+  res.render("urls_show", templateVars);
 });
 
 app.get("/hellos", (req, res) => {
