@@ -9,23 +9,23 @@
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
-      <% if(username){ %>
-        <div class="card-center" style="text-align:right">
-          <form class="form-inline" action="/logout" method="POST" move="right">
-              <input type="hidden" name="username">
-              <button type="submit" class="btn btn-dark">logout</button>
-              <p style="text-align:right" color="white"><%= username %></p>
-          </form>
-          </div>
-      <% } else{ %>
-        <div class="card-center" style="text-align:right">
-        <form class="form-inline" action="/login" method="POST" move="right">
-            <input class="form-control" type="text" name="username">
-            <button type="submit" class="btn btn-dark">login</button>
-            <p style="text-align:right" color="white"><%= username %></p>
-        </form>
-        </div>
-      <% } %>
+  </div>
+  <% if(username){ %>
+    <div class="card-center" style="text-align:right">
+      <form class="form-inline" action="/logout" method="POST" move="right">
+          <input type="hidden" name="username">
+          <p style="text-align:right" color="white"><%= username %></p>
+          <button type="submit" class="btn btn-dark">logout</button>
+      </form>
+      </div>
+  <% } else{ %>
+    <div class="card-center" style="justify-content">
+    <form class="form-inline" action="/login" method="POST" move="right">
+        <input class="form-control" type="text" name="username">
+        <button type="submit" class="btn btn-dark">login</button>
+        <p style="text-align:right" color="white"><%= username %></p>
+    </form>
     </div>
+  <% } %>
   </nav>
 </header>
