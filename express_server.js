@@ -30,7 +30,13 @@ app.get("/urls", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  const templateVars = { username: req.cookies["username"]};
+  res.render("urls_new", templateVars);
+});
+
+app.get("/urls/show", (req, res) => {
+  const templateVars = { username: req.cookies["username"]};
+  res.render("urls_new", templateVars);
 });
 
 app.get("/urls/:shortURL", (req, res) => {
@@ -67,6 +73,16 @@ app.post("/login", (req, res) => {
   const username = req.body.username; 
   res.cookie('username', username);
   res.redirect("/urls");
+});
+
+app.post("/urls/show", (req, res) => {
+  const templateVars = { username: username };
+  res.send("/urls/show", templateVars)
+});
+
+app.post("/urls/new", (req, res) => {
+  const templateVars = { username: req.cookies["username"]};
+  res.send("urls_new", templateVars);
 });
 
 app.listen(PORT, () => {
