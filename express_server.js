@@ -3,7 +3,7 @@ const app = express();
 const PORT = 8080; 
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser')
-
+app.use(cookieParser());
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
 
@@ -62,6 +62,11 @@ app.post("/urls/:id/edit", (req, res) => {
   urlDatabase[shortURL] = longURL;
   res.redirect("/urls");
 });
+
+app.post("/login"), (req, res) => {
+  res.cookie('username', req.body.username);
+  res.redirect("/urls")
+}
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
