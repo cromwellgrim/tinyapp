@@ -3,19 +3,14 @@ const app = express();
 const PORT = 8080; 
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser')
-const { genRandom } = require('./genRandom.js');
-const { emailLookup } = require('./emailLookup.js'); 
+const { genRandom, emailLookup, loginLookup } = require('./helperFunctions'); 
+
 
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
 
-const currentUser = {
-  id: "randomID",
-  email: "email",
-  password: "password"
-}
-
+// "global" variables
 const users = {
   "userRandomID": {
     id: "userRandomID",
@@ -34,14 +29,13 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.ca"
 };
 
+// server sites
 
 app.get("/urls.json", (req, res) => {
-  console.log(users[id]);
   res.json(urlDatabase);
 });
 
 app.get("/", (req, res) => {
-  const templateVars = { urls: urlDatabase, user: req.cookies["user"] };
   res.render("urls_index", templateVars);
 });
 
@@ -85,52 +79,16 @@ app.get("/urls/register", (req, res) => {
   res.render("urls_register", templateVars);
 });
 
-// this is for generating shortURLs
-app.post("/urls", (req, res) => {
-  const shortURL = genRandom();
-  const longURL = req.body.longURL;
-  urlDatabase[shortURL] = longURL;
-  res.redirect(`/urls/${shortURL}`);
-});
-
-app.post("/urls/:shortURL/delete", (req, res) => {
-  const shortURL = req.params.shortURL;
-  delete urlDatabase[shortURL];
-  res.redirect("/urls");
-});
-
-// app.post("/urls/:shortURL", (req, res) => {
-//   const templateVars = { user: req.cookies["user"] };
-//   res.render("urls_new", templateVars);
-// })
-
-app.post("/urls/:id/edit", (req, res) => {
-  const longURL = req.body.longURL;
-  const shortURL = req.body.shortURL;
-  urlDatabase[shortURL] = longURL;
-  res.redirect("/urls");
-});
-
-app.post("/logout", (req, res) => {
-  const user = req.body.user;
-  res.cookie('user', user);
-  res.clearCookie('user');
-  res.redirect("/urls");
-});
-
-app.post("/urls/show", (req, res) => {
-  const templateVars = { user: req.cookies["user"] };
-  res.send("urls_show", templateVars)
-});
-
-app.post("/urls/new", (req, res) => {
-  const templateVars = { user: req.cookies["user"] };
-  res.send("urls_new", templateVars);
-});
-
 app.post("/urls/login", (req, res) => {
-  const templateVars = { user: req.cookies["user"] };
-  res.send("urls_login", templateVars);
+  if((loginLookup(req.body.email, req.cookies["user"])) && (loginLookup(req.body.password, req.cookies["user"]))) {
+    res.cookie('user', users[id].email)
+    res.redirect("/urls");
+  }
+  else {
+    res.status(403);
+    res.send('403 error, no account found');
+  }
+  
 });
 
 app.post("/urls/register", (req, res) => {
@@ -151,6 +109,54 @@ app.post("/urls/register", (req, res) => {
   else {
     res.redirect("/urls");
   }
+});
+
+// this is for generating shortURLs
+app.post("/urls", (req, res) => {
+  const shortURL = genRandom();
+  const longURL = req.body.longURL;
+  urlDatabase[shortURL] = longURL;
+  res.redirect(`/urls/${shortURL}`);
+});
+
+app.post("/urls/:shortURL/delete", (req, res) => {
+  const shortURL = req.params.shortURL;
+  delete urlDatabase[shortURL];
+  res.redirect("/urls");
+});
+
+app.post("/urls/:shortURL", (req, res) => {
+  const templateVars = { user: req.cookies["user"] };
+  res.render("urls_new", templateVars);
+})
+
+app.post("/urls/:id/edit", (req, res) => {
+  const longURL = req.body.longURL;
+  const shortURL = req.body.shortURL;
+  urlDatabase[shortURL] = longURL;
+  res.redirect("/urls");
+});
+
+app.post("/logout", (req, res) => {
+  const user = { user: req.cookies["user"]};
+  res.cookie('user', user);
+  res.clearCookie('user');
+  res.redirect("/urls");
+});
+
+app.post("/urls/show", (req, res) => {
+  const templateVars = { user: req.cookies["user"] };
+  res.send("urls_show", templateVars)
+});
+
+app.post("/urls/new", (req, res) => {
+  const templateVars = { user: req.cookies["user"] };
+  res.send("urls_new", templateVars);
+});
+
+app.post("/urls/login", (req, res) => {
+  const templateVars = { user: req.cookies["user"] };
+  res.send("urls_login", templateVars);
 });
 
 app.post("*", (req, res) => {
