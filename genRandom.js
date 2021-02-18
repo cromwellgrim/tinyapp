@@ -8,4 +8,4 @@ const genRandom = function() {
 
 
 
-module.exports = genRandom();
+module.exports = { genRandom };

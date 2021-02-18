@@ -11,20 +11,20 @@
         <a class="nav-item nav-link" href="/urls/register">Register</a>
       </div>
   </div>
-  <% if(currentUser){ %>
+  <% if(user != undefined){ %>
     <div class="card-center" style="text-align:right">
       <form class="form-inline" action="/logout" method="POST" move="right">
-          <input type="hidden" name="currentUser">
-          <p style="text-align:right" color="white"><%= currentUser %></p>
+          <input type="hidden" name="user">
+          <p style="text-align:right" color="white"><%= user["email"] %></p>
           <button type="submit" class="btn btn-dark">logout</button>
       </form>
       </div>
   <% } else{ %>
     <div class="card-center" style="justify-content">
     <form class="form-inline" action="/login" method="POST" move="right">
-        <input class="form-control" type="text" name="currentUser">
+        <input class="form-control" type="text" name="user">
         <button type="submit" class="btn btn-dark">login</button>
-        <p style="text-align:right" color="white"><%= currentUser %></p>
+        <p style="text-align:right" color="white"></p>
     </form>
     </div>
   <% } %>
