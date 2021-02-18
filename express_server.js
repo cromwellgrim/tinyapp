@@ -4,6 +4,8 @@ const PORT = 8080;
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser')
 const { genRandom } = require('./genRandom.js');
+const { emailLookup } = require('./emailLookup.js'); 
+
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
@@ -127,15 +129,24 @@ app.post("/urls/new", (req, res) => {
   res.send("urls_new", templateVars);
 });
 
-app.post("/urls/register", (req, res) => {
+app.post("/urls/register", (req, res, next) => {
   const id = genRandom()
   users[id] = { id: id,
     email: req.body.email,
     password: req.body.password
   };
-  console.log(users[id])
   res.cookie('user', users[id]);
-  res.redirect("/urls");
+  if(users[id].email === '' || users[id].password === '') {
+    res.status(400);
+    res.send('400 error, please fill in all fields');
+  }
+  if(emailLookup(req.body.email, users)){
+    res.status(400);
+    res.send('400 error, email already in use');
+  } 
+  else {
+    res.redirect("/urls");
+  }
 });
 
 app.post("*", (req, res) => {
