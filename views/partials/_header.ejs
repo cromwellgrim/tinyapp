@@ -21,9 +21,13 @@
       </div>
   <% } else{ %>
     <div class="card-center" style="justify-content">
-    <form class="form-inline" action="/login" method="POST" move="right">
+      <form class="form-inline" action="/urls/register" method="POST">
+        <button type="submit" class="btn btn-dark">register</button>
+        <p style="justify-content: right;" color="white"></p>
+    </form>
+    <form class="form-inline" action="/urls/login" method="POST">
         <button type="submit" class="btn btn-dark">login</button>
-        <p style="text-align:right" color="white"></p>
+        <p style="justify-content: right;" color="white"></p>
     </form>
     </div>
   <% } %>
