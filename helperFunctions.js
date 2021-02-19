@@ -6,19 +6,19 @@ const genRandom = function() {
 const emailLookup = function(email, users) {
   for (let each in users) {
     if(email === users[each].email) {
-      return 'this email is already in use';
+      return users[each]
     }
   }
-  return 'good to go'
+  return false
 };
 
-const loginLookup = function(login, users) {
+const loginLookup = function(password, users) {
   for (let each in users) {
-    if(login === users[each].login) {
-      return 'good to go'
+    if(password === users[each].password) {
+      return users[each]
     }
   }
-  return 'bad password'
+  return false
 };
 
 
