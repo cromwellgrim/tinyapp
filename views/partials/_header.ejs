@@ -10,7 +10,7 @@
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
     </div>
-  <% if(!user){ %>
+  <% if(typeof user === "undefined"){ %>
     <div class="card-center" style="justify-content:right">
       <form class="form-inline" action="/urls/register" method="GET">
           <button type="submit" class="btn btn-dark">register</button>

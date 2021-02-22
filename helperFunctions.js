@@ -4,33 +4,32 @@ const genRandom = function() {
 };
 
 const emailLookup = function(email, users) {
-  for (let each in users) {
-    if(email === users[each].email) {
-      return users[each];
-    }
-  }
-  return false
+  return Object.keys(users).find(id => users[id]["email"] === email);
 };
 
-const loginLookup = function(password, users) {
-  for (let each in users) {
-    if(password === users[each].password) {
-      return users[each];
-    }
+const urlsOfUser = function(urls, user) {
+  let urlsToDisplay = {};
+  console.log(Object.keys(urls))
+  const shortUrlsArr = (urls, val) => Object.keys(urls).filter(key => {
+    console.log(urls[key])
+    console.log(urls[key]["userID"])
+    urls[key]["userID"] === val
+  });
+  let arrayForUser = shortUrlsArr(urls, user)
+  console.log("********")
+  console.log(arrayForUser)
+  console.log("********")
+  for (let i of arrayForUser) {
+    console.log(i)
+    urlsToDisplay[i] = urls[i]["longURL"]
   }
-  return false
+  console.log(urlsToDisplay)
+  return urlsToDisplay
+
+  
 };
 
-const urlLookup = function(url, users) {
-  for (let user in users) {
-    if(user[shortURL] === url) {
-      return user[shortURL];
-    }
-  }
-  return false
-}
 
 
 
-
-module.exports = { genRandom, emailLookup, loginLookup };
+module.exports = { genRandom, emailLookup, urlsOfUser };
