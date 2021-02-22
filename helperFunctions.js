@@ -9,24 +9,13 @@ const emailLookup = function(email, users) {
 
 const urlsOfUser = function(urls, user) {
   let urlsToDisplay = {};
-  console.log(Object.keys(urls))
-  const shortUrlsArr = (urls, val) => Object.keys(urls).filter(key => {
-    console.log(urls[key])
-    console.log(urls[key]["userID"])
-    urls[key]["userID"] === val
-  });
-  let arrayForUser = shortUrlsArr(urls, user)
-  console.log("********")
-  console.log(arrayForUser)
-  console.log("********")
-  for (let i of arrayForUser) {
-    console.log(i)
-    urlsToDisplay[i] = urls[i]["longURL"]
+  let arrayForUser = [];
+  for (const each in urls) {
+    if (urls[each]["userID"] === user){
+      urlsToDisplay[each] = {longURL: urls[each]["longURL"]}
+    }
   }
-  console.log(urlsToDisplay)
   return urlsToDisplay
-
-  
 };
 
 

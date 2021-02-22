@@ -47,12 +47,21 @@ app.get("/urls", (req, res) => {
     res.redirect("/urls/login");
   } else {
   const activeUser = req.session.userID
+  console.log("USER:::",activeUser)
+  const activeUserEmail = Object.keys(users).find(email => users["id"] === activeUser)
+  console.log("USER EMAIL", activeUserEmail)
   // console.log(users[activeUser])
   // console.log("in urls home page", activeUser)
   // console.log(users[activeUser])
-  const urlsToDisplay = urlsOfUser(activeUser, urlDatabase)
-  
-  const templateVars = { urls: urlDatabase, user: req.session.userID };
+  const urlsToDisplay = urlsOfUser(urlDatabase, activeUser)
+  console.log(urlsToDisplay)
+  // passing an object to the user that has the ID and email: actual email
+  /*    users[id] = { 
+    id: id,
+    email: req.body.email,
+    password: hashedPass
+  };*/
+  const templateVars = { urls: urlsToDisplay, user: req.session.userID };
   res.render("urls_index", templateVars);
   }
 });
@@ -64,6 +73,7 @@ app.get("/urls/login", (req, res) => {
   if (!activeUser) {
     return res.render("urls_login");
   }
+  
   const templateVars = { urls: urlDatabase, user: activeUser };
   res.render("urls_index", templateVars);
 });
@@ -98,7 +108,7 @@ app.post("/urls/register", (req, res) => {
       password: hashedPass
     };
     req.session.userID = id;
-    res.redirect("/urls", id.email);
+    res.redirect("/urls");
   }
   if(req.body.email === '' || req.body.password === '') {
     return res.status(400).send('400 error, please fill in all fields');
@@ -150,7 +160,7 @@ app.post("/urls/", (req, res) => {
     const longURL = req.body.longURL;
     urlDatabase[shortURL] = {
       longURL: longURL,
-      userID: req.session.userID["id"]
+      userID: req.session.userID
     };
     res.redirect(`/urls/${shortURL}`);
   } else {
