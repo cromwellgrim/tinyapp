@@ -3,7 +3,7 @@ const app = express();
 const PORT = 8080; 
 const bodyParser = require('body-parser');
 const cookieSession = require('cookie-session');
-const bcrypt - require('bcrypt');
+const bcrypt = require('bcrypt');
 const { genRandom, emailLookup, loginLookup } = require('./helperFunctions'); 
 
 
@@ -20,7 +20,7 @@ const users = {
   "userOne": {
     id: "userRandomID",
     email: "user@example.com",
-    password: "example"
+    password: bcrypt.compareSync(id[password], "example")
   },
   "userTwo": {
     id: "user2RandomID",
@@ -80,7 +80,7 @@ app.post("/urls/register", (req, res) => {
     users[id] = { 
       id: id,
       email: req.body.email,
-      password: req.body.password
+      password: bcrypt(req.body.password, 10)
     };
     console.log(users);
     return res.cookie('user', id).redirect("/urls");

@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "./node_modules/mocha/bin/mocha",
     "start": "./node_modules/.bin/nodemon -L express_server.js"
   },
   "repository": {
@@ -28,8 +28,9 @@
     "@popperjs/core": "^2.6.0",
     "body-parser": "^1.19.0",
     "bootstrap": "^5.0.0-beta2",
-    "cookie-parser": "^1.4.5",
+    "chai": "^4.3.0",
     "cookie-session": "^1.4.0",
-    "ejs": "^3.1.6"
+    "ejs": "^3.1.6",
+    "mocha": "^8.3.0"
   }
 }

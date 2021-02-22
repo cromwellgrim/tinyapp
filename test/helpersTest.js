@@ -1,6 +1,6 @@
 const { assert } = require('chai');
 
-const { emailLookup } = require('../helperFunctions.js');
+const { emailLookup, urlLookup } = require('../helperFunctions.js');
 
 const testUsers = {
   "userRandomID": {
@@ -39,5 +39,3 @@ describe('emailLookup', function() {
     assert.isUndefined(user);
   });
 });
-
-

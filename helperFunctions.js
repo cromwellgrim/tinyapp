@@ -6,7 +6,7 @@ const genRandom = function() {
 const emailLookup = function(email, users) {
   for (let each in users) {
     if(email === users[each].email) {
-      return users[each]
+      return users[each];
     }
   }
   return false
@@ -15,12 +15,20 @@ const emailLookup = function(email, users) {
 const loginLookup = function(password, users) {
   for (let each in users) {
     if(password === users[each].password) {
-      return users[each]
+      return users[each];
     }
   }
   return false
 };
 
+const urlLookup = function(url, users) {
+  for (let user in users) {
+    if(user[shortURL] === url) {
+      return user[shortURL];
+    }
+  }
+  return false
+}
 
 
 
