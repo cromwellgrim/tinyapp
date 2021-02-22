@@ -2,11 +2,15 @@ const express = require('express');
 const app = express();
 const PORT = 8080; 
 const bodyParser = require('body-parser');
-const cookieParser = require('cookie-parser')
+const cookieSession = require('cookie-session');
+const bcrypt - require('bcrypt');
 const { genRandom, emailLookup, loginLookup } = require('./helperFunctions'); 
 
 
-app.use(cookieParser());
+app.use(cookieSession({
+  name: 'session',
+  keys:['key1', 'key2']
+}));
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
 
@@ -38,7 +42,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  const activeUser = req.cookies.user
+  const activeUser = req.session.user
   // const shortURL = urlDatabase["b2xVn2"]
   // const longURL = shortURL.longURL
   const templateVars = { urls: urlDatabase, user: users[activeUser] };
@@ -48,7 +52,7 @@ app.get("/urls", (req, res) => {
 // login page
 
 app.get("/urls/login", (req, res) => {
-  const activeUser = req.cookies.user
+  const activeUser = req.session.user
   const templateVars = { urls: urlDatabase, user: users[activeUser] };
   res.render("urls_login", templateVars);
 });
@@ -65,7 +69,7 @@ app.post("/urls/login", (req, res) => {
 // register page
 
 app.get("/urls/register", (req, res) => {
-  const activeUser = req.cookies.user
+  const activeUser = req.session.user
   const templateVars = { urls: urlDatabase, user: users[activeUser] };
   res.render("urls_register", templateVars);
 });
@@ -93,15 +97,15 @@ app.post("/urls/register", (req, res) => {
 // logout and clear user
 
 app.post("/logout", (req, res) => {
-  const user = { user: req.cookies.user};
+  const user = { user: req.session.user};
   res.cookie('user', user).clearCookie('user', user).redirect("/urls");
 });
 
 // create new URL
 
 app.get("/urls/new", (req, res) => {
-  const templateVars = { urls: urlDatabase, user: req.cookies.user }
-  const activeUser = req.cookies.user
+  const templateVars = { urls: urlDatabase, user: req.session.user }
+  const activeUser = req.session.user
   console.log("new", urlDatabase)
   if(activeUser === undefined) {
     return res.redirect("/urls");
@@ -113,7 +117,7 @@ app.get("/urls/new", (req, res) => {
 
 app.get("/urls/:shortURL", (req, res) => {
   console.log("shortURL", urlDatabase)
-  const templateVars = { shortURL: req.body.shortURL, longURL: urlDatabase[req.body.shortURL]["longURL"], user: req.cookies.user };
+  const templateVars = { shortURL: req.body.shortURL, longURL: urlDatabase[req.body.shortURL]["longURL"], user: req.session.user };
   res.render("urls_show", templateVars);
 });
 
