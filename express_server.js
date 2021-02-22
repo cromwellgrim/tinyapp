@@ -13,24 +13,23 @@ app.set("view engine", "ejs");
 // global variables
 
 const users = {
-  "userRandomID": {
+  "userOne": {
     id: "userRandomID",
     email: "user@example.com",
     password: "example"
   },
-  "user2RandomID": {
+  "userTwo": {
     id: "user2RandomID",
     email: "user2@example.com",
     password: "example2"
   }
 };
 
-console.log("base users", users);
-
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.ca"
+  "b2xVn2": { longURL: "http://www.lighthouselabs.ca", id: users },
+  "9sm5xK": { longURL: "http://www.google.ca", id: users }
 };
+
 
 // home page
 
@@ -40,6 +39,8 @@ app.get("/", (req, res) => {
 
 app.get("/urls", (req, res) => {
   const activeUser = req.cookies.user
+  // const shortURL = urlDatabase["b2xVn2"]
+  // const longURL = shortURL.longURL
   const templateVars = { urls: urlDatabase, user: users[activeUser] };
   res.render("urls_index", templateVars);
 });
@@ -55,9 +56,8 @@ app.get("/urls/login", (req, res) => {
 app.post("/urls/login", (req, res) => {
   if(emailLookup(req.body.email, users) && loginLookup(req.body.password, users)) {
     let activeUser = emailLookup(req.body.email, users);
-    console.log("inside login", activeUser)
     let id = activeUser.id
-    res.cookie('user', id).redirect("/urls");
+    return res.cookie('user', id).redirect("/urls");
   }
   res.status(403).send("login issue");
 });
@@ -66,36 +66,26 @@ app.post("/urls/login", (req, res) => {
 
 app.get("/urls/register", (req, res) => {
   const activeUser = req.cookies.user
-  console.log(activeUser)
   const templateVars = { urls: urlDatabase, user: users[activeUser] };
   res.render("urls_register", templateVars);
 });
 
-// app.post("/urls/register", (req, res) => {
-//   const id = genRandom()
-//   users[id] = { id: id,
-//     email: req.body.email,
-//     password: req.body.password
-//   };
-//   console.log(users)
-//   res.cookie('user', id).redirect("/urls");
-// });
-
 app.post("/urls/register", (req, res) => {
   if(!emailLookup(req.body.email, users)) {
-    const id = genRandom()
-    users[id] = { id: id,
+    const id = genRandom();
+    users[id] = { 
+      id: id,
       email: req.body.email,
       password: req.body.password
     };
-    console.log(users)
-    res.cookie('user', id).redirect("/urls");
+    console.log(users);
+    return res.cookie('user', id).redirect("/urls");
   }
   if(req.body.email === '' || req.body.password === '') {
-    res.status(400).send('400 error, please fill in all fields');
+    return res.status(400).send('400 error, please fill in all fields');
   }
   if(emailLookup(req.body.email, users)){
-    res.status(400).send('400 error, email already in use');
+    return res.status(400).send('400 error, email already in use');
   } 
   res.redirect("/urls");
 });
@@ -104,34 +94,39 @@ app.post("/urls/register", (req, res) => {
 
 app.post("/logout", (req, res) => {
   const user = { user: req.cookies.user};
-  res.cookie('user', user);
-  res.clearCookie('user', user);
-  res.redirect("/urls");
+  res.cookie('user', user).clearCookie('user', user).redirect("/urls");
 });
 
 // create new URL
 
 app.get("/urls/new", (req, res) => {
-  const templateVars = { user: req.cookies.user};
+  const templateVars = { urls: urlDatabase, user: req.cookies.user }
+  const activeUser = req.cookies.user
+  console.log("new", urlDatabase)
+  if(activeUser === undefined) {
+    return res.redirect("/urls");
+  }
   res.render("urls_new", templateVars);
 })
 
 // shortURL routing and functionality
 
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], user: req.cookies.user };
+  console.log("shortURL", urlDatabase)
+  const templateVars = { shortURL: req.body.shortURL, longURL: urlDatabase[req.body.shortURL]["longURL"], user: req.cookies.user };
   res.render("urls_show", templateVars);
 });
 
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL];
+  const longURL = urlDatabase[req.params.shortURL]["longURL"];
   res.redirect(longURL);
 });
 
-app.post("/urls", (req, res) => {
+app.post("/urls/", (req, res) => {
   const shortURL = genRandom();
   const longURL = req.body.longURL;
-  urlDatabase[shortURL] = longURL;
+  urlDatabase[shortURL]["longURL"] = longURL;
+  console.log("at longURL in gen", urlDatabase)
   res.redirect(`/urls/${shortURL}`);
 });
 
