@@ -26,5 +26,3 @@ const loginLookup = function(password, users) {
 
 
 module.exports = { genRandom, emailLookup, loginLookup };
-
-
