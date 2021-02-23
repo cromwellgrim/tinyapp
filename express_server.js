@@ -165,7 +165,7 @@ app.post("/urls/:id/edit", (req, res) => {
   const newlongURL = req.body.longURL;
   const shortURL = req.body.shortURL;
   urlDatabase[shortURL].longURL = newlongURL;
-  const templateVars = { urls: urlDatabase, user: req.session.userID };
+  const templateVars = { urls: {shortURL: newlongURL}, user: req.session.userID };
   res.render("urls_index", templateVars);
 });
 
