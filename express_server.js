@@ -39,7 +39,7 @@ const urlDatabase = {
 // home page
 
 app.get("/", (req, res) => {
-  res.render("urls_index");
+  res.redirect("/urls");
 });
 
 app.get("/urls", (req, res) => {
@@ -165,7 +165,7 @@ app.post("/urls/:id/edit", (req, res) => {
   const newlongURL = req.body.longURL;
   const shortURL = req.body.shortURL;
   urlDatabase[shortURL].longURL = newlongURL;
-  const templateVars = { urls: {shortURL: newlongURL}, user: req.session.userID };
+  const templateVars = { urls: { shortURL: newlongURL }, user: req.session.userID };
   res.render("urls_index", templateVars);
 });
 
