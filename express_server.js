@@ -44,7 +44,7 @@ app.get("/", (req, res) => {
 
 app.get("/urls", (req, res) => {
   if (req.session.userID === undefined) {
-    res.redirect("/urls/login");
+    res.redirect("/login");
   } else {
     const activeUser = req.session.userID;
     const urlsToDisplay = urlsOfUser(urlDatabase, activeUser.id);
@@ -55,7 +55,7 @@ app.get("/urls", (req, res) => {
 
 // login page
 
-app.get("/urls/login", (req, res) => {
+app.get("/login", (req, res) => {
   const activeUser = req.session.userID;
   if (!activeUser) {
     return res.render("urls_login");
@@ -65,7 +65,7 @@ app.get("/urls/login", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
-app.post("/urls/login", (req, res) => {
+app.post("/login", (req, res) => {
   let activeUser = emailLookup(req.body.email, users);
   if (emailLookup(req.body.email, users)) {
     if (bcrypt.compareSync(req.body["password"], users[activeUser]["password"])) {
@@ -80,13 +80,13 @@ app.post("/urls/login", (req, res) => {
 
 // register page
 
-app.get("/urls/register", (req, res) => {
+app.get("/register", (req, res) => {
   const activeUser = req.session.userID;
   const templateVars = { urls: urlDatabase, user: activeUser};
   res.render("urls_register", templateVars);
 });
 
-app.post("/urls/register", (req, res) => {
+app.post("/register", (req, res) => {
   if (!emailLookup(req.body.email, users)) {
     const id = genRandom();
     const hashedPass = bcrypt.hashSync(req.body.password, 10);
@@ -151,7 +151,7 @@ app.post("/urls/", (req, res) => {
     };
     res.redirect(`/urls/${shortURL}`);
   } else {
-    res.redirect("/urls/login");
+    res.redirect("/login");
   }
 });
 
