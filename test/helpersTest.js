@@ -1,6 +1,6 @@
 const { assert } = require('chai');
 
-const { emailLookup, urlLookup } = require('../helperFunctions.js');
+const { emailLookup, urlsOfUser } = require('../helperFunctions.js');
 
 const testUsers = {
   "userRandomID": {
@@ -15,6 +15,8 @@ const testUsers = {
   }
 };
 
+const testUserID = "userRandomID";
+
 const urlDatabase = {
   "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "userRandomID"},
   "9sm5xK": { longURL: "http://www.google.ca", userID: "userRandomID"  }
@@ -22,7 +24,7 @@ const urlDatabase = {
 
 describe('emailLookup', function() {
   it('should return a user with valid email', function() {
-    const user = emailLookup(testUsers, "user@example.com")
+    const user = emailLookup("user@example.com", testUsers)
     const expectedOutput = "userRandomID";
     // Write your assert statement here
     assert.equal(user, expectedOutput, 'user should be userRandomID');
@@ -39,3 +41,15 @@ describe('emailLookup', function() {
     assert.isUndefined(user);
   });
 });
+
+describe('urlsOfUser', function() {
+  it("should return an object with the user's urls", function() {
+    const urls = urlsOfUser(urlDatabase, testUserID)
+    expectedOutput = {
+      b2xVn2: { longURL: 'http://www.lighthouselabs.ca' },
+      '9sm5xK': { longURL: 'http://www.google.ca' }
+    }
+    assert.deepEqual(urls, expectedOutput)
+  });
+});
+

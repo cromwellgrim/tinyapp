@@ -1,10 +1,10 @@
 const express = require('express');
 const app = express();
-const PORT = 8080; 
+const PORT = 8080;
 const bodyParser = require('body-parser');
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcrypt');
-const { genRandom, emailLookup, urlsOfUser } = require('./helperFunctions'); 
+const { genRandom, emailLookup, urlsOfUser } = require('./helperFunctions');
 
 
 app.use(cookieSession({
@@ -46,23 +46,10 @@ app.get("/urls", (req, res) => {
   if (req.session.userID === undefined) {
     res.redirect("/urls/login");
   } else {
-  const activeUser = req.session.userID
-  console.log("USER:::",activeUser)
-  const activeUserEmail = Object.keys(users).find(email => users["id"] === activeUser)
-  console.log("USER EMAIL", activeUserEmail)
-  // console.log(users[activeUser])
-  // console.log("in urls home page", activeUser)
-  // console.log(users[activeUser])
-  const urlsToDisplay = urlsOfUser(urlDatabase, activeUser)
-  console.log(urlsToDisplay)
-  // passing an object to the user that has the ID and email: actual email
-  /*    users[id] = { 
-    id: id,
-    email: req.body.email,
-    password: hashedPass
-  };*/
-  const templateVars = { urls: urlsToDisplay, user: req.session.userID };
-  res.render("urls_index", templateVars);
+    const activeUser = req.session.userID;
+    const urlsToDisplay = urlsOfUser(urlDatabase, activeUser.id);
+    const templateVars = { urls: urlsToDisplay, user: req.session.userID };
+    res.render("urls_index", templateVars);
   }
 });
 
@@ -79,11 +66,12 @@ app.get("/urls/login", (req, res) => {
 });
 
 app.post("/urls/login", (req, res) => {
+  let activeUser = emailLookup(req.body.email, users);
   if (emailLookup(req.body.email, users)) {
-    let activeUser = emailLookup(req.body.email, users);
     if (bcrypt.compareSync(req.body["password"], users[activeUser]["password"])) {
-      req.session.userID = users[activeUser].id;
-      res.redirect("/urls");
+      req.session.userID = users[activeUser];
+      const templateVars = { urls: urlDatabase, user: activeUser };
+      res.render("urls_index", templateVars);
     }
   } else {
     res.status(403).send("login issue");
@@ -93,50 +81,49 @@ app.post("/urls/login", (req, res) => {
 // register page
 
 app.get("/urls/register", (req, res) => {
-  const activeUser = req.session.user;
-  const templateVars = { urls: urlDatabase, user: users[activeUser] };
+  const activeUser = req.session.userID;
+  const templateVars = { urls: urlDatabase, user: activeUser};
   res.render("urls_register", templateVars);
 });
 
 app.post("/urls/register", (req, res) => {
-  if(!emailLookup(req.body.email, users)) {
+  if (!emailLookup(req.body.email, users)) {
     const id = genRandom();
     const hashedPass = bcrypt.hashSync(req.body.password, 10);
-    users[id] = { 
+    users[id] = {
       id: id,
       email: req.body.email,
       password: hashedPass
     };
-    req.session.userID = id;
+    req.session.userID = users[id];
     res.redirect("/urls");
   }
-  if(req.body.email === '' || req.body.password === '') {
+  if (req.body.email === '' || req.body.password === '') {
     return res.status(400).send('400 error, please fill in all fields');
   }
-  if(emailLookup(req.body.email, users)){
+  if (emailLookup(req.body.email, users)) {
     return res.status(400).send('400 error, email already in use');
-  } 
+  }
   res.redirect("/urls");
 });
 
 // logout and clear user
 
 app.post("/logout", (req, res) => {
-  req.session = null
+  req.session = null;
   res.redirect("/urls");
 });
 
 // create new URL
 
 app.get("/urls/new", (req, res) => {
-  const templateVars = { urls: urlDatabase, user: req.session.userID }
-  const activeUser = req.session.userID
-  console.log("new", urlDatabase)
-  if(activeUser === undefined) {
+  const templateVars = { urls: urlDatabase, user: req.session.userID };
+  const activeUser = req.session.userID;
+  if (activeUser === undefined) {
     return res.redirect("/urls");
   }
   res.render("urls_new", templateVars);
-})
+});
 
 // shortURL routing and functionality
 
@@ -145,7 +132,7 @@ app.get("/urls/:shortURL", (req, res) => {
     const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL]["longURL"], user: req.session.userID };
     res.render("urls_show", templateVars);
   } else {
-  res.redirect("/urls");
+    res.redirect("/urls");
   }
 });
 
@@ -160,7 +147,7 @@ app.post("/urls/", (req, res) => {
     const longURL = req.body.longURL;
     urlDatabase[shortURL] = {
       longURL: longURL,
-      userID: req.session.userID
+      userID: req.session.userID["id"]
     };
     res.redirect(`/urls/${shortURL}`);
   } else {
@@ -175,14 +162,15 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 });
 
 app.post("/urls/:id/edit", (req, res) => {
-  const longURL = req.body.longURL;
+  const newlongURL = req.body.longURL;
   const shortURL = req.body.shortURL;
-  urlDatabase[shortURL] = longURL;
-  res.redirect("/urls");
+  urlDatabase[shortURL].longURL = newlongURL;
+  const templateVars = { urls: urlDatabase, user: req.session.userID };
+  res.render("urls_index", templateVars);
 });
 
 app.post("*", (req, res) => {
-  res.status(404).send("FOUR ZERO FOUR")
+  res.status(404).send("FOUR ZERO FOUR");
 });
 
 app.listen(PORT, () => {
