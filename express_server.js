@@ -138,7 +138,7 @@ app.get("/urls/new", (req, res) => {
 	const templateVars = { urls: urlDatabase, user: req.session.userID };
 	const activeUser = req.session.userID;
 	if (activeUser === undefined) {
-		return res.redirect("/urls");
+		return res.redirect("/login");
 	}
 	res.render("urls_new", templateVars);
 });
@@ -154,7 +154,7 @@ app.post("/urls/", (req, res) => {
 		};
 		res.redirect(`/urls/${shortURL}`);
 	} else {
-		res.redirect("/login");
+		res.status("400").send("Please go to /login")
 	}
 });
 
@@ -165,7 +165,11 @@ app.post("/urls/", (req, res) => {
 /* follow your shortURL link to the longURL site */
 app.get("/u/:shortURL", (req, res) => {
 	const longURL = urlDatabase[req.params.shortURL]["longURL"];
+	if(longURL !== undefined){
 	res.redirect(longURL);
+	} else {
+		res.status(404).send("No shortURL made with this id yet");
+	}
 });
 
 /* shows the page for a specific shortURL */
