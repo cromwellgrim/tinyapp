@@ -52,7 +52,7 @@ app.get("/", (req, res) => {
 /* if user is not logged in go to login, otherwise show their database */
 app.get("/urls", (req, res) => {
 	if (req.session.userID === undefined) {
-		res.redirect("/login");
+		res.status(400).send("Please go to /login");
 	} else {
 		const activeUser = req.session.userID;
 		const urlsToDisplay = urlsOfUser(urlDatabase, activeUser.id);
@@ -89,7 +89,7 @@ app.post("/login", (req, res) => {
 			return res.status(400).send("400 error, login issue");
 		}
 	} else {
-		return res.redirect("/register");
+		return res.status(400).send("400 error, login issue");
 	}
 });
 
@@ -176,10 +176,10 @@ app.get("/urls/:shortURL", (req, res) => {
 			};
 			res.render("urls_show", templateVars);
 		} else {
-			res.redirect("/urls");
+			res.status(404).send("page not found");
 		}
 	} else {
-		res.redirect("/login");
+		res.status(400).send("please login")
 	}
 });
 
@@ -209,16 +209,25 @@ app.post("/urls/:shortURL/edit", (req, res) => {
 			const shortURL = req.params.shortURL;
 			const longURL = req.body.longURL;
 			urlDatabase[shortURL] = { longURL: longURL, userID: userID };
-			res.redirect(`/urls/${shortURL}`);
+			res.redirect("/urls");
 		}
 	}
 });
 
 /* deletes shortURL from urlDatabase */
 app.post("/urls/:shortURL/delete", (req, res) => {
-	const shortURL = req.params.shortURL;
-	delete urlDatabase[shortURL];
-	res.redirect("/urls");
+	if(!req.session.userID) {
+		res.status(400).send("Please login");
+	} else {
+		urlsToDisplay = urlsOfUser(urlDatabase, req.session.userID.id);
+		if (urlsToDisplay[req.params.shortURL] !== undefined) {
+		const shortURL = req.params.shortURL;
+		delete urlDatabase[shortURL];
+		res.redirect("/urls");
+		} else {
+			res.status(400).send("Please don't delete someone else's shortURL")
+		}
+	}
 });
 
 //---------------------------
