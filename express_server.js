@@ -168,11 +168,11 @@ app.post("/urls/", (req, res) => {
 
 /* follow your shortURL link to the longURL site */
 app.get("/u/:shortURL", (req, res) => {
-	const longURL = urlDatabase[req.params.shortURL]["longURL"];
-	if(longURL !== undefined){
-	res.redirect(longURL);
-	} else {
+	if(!urlDatabase[req.params.shortURL]){
 		res.status(404).send("No shortURL made with this id yet");
+	} else {
+		const longURL = urlDatabase[req.params.shortURL]["longURL"];
+		res.redirect(longURL);
 	}
 });
 
@@ -188,7 +188,7 @@ app.get("/urls/:shortURL", (req, res) => {
 			};
 			res.render("urls_show", templateVars);
 		} else {
-			res.status(404).send("page not found");
+			res.status(404).send("this is not your shortURL page");
 		}
 	} else {
 		res.status(400).send("please login")
@@ -197,16 +197,20 @@ app.get("/urls/:shortURL", (req, res) => {
 
 /* allows users to edit their shortURL */
 app.get("/urls/:shortURL/edit", (req, res) => {
-	if (!req.session.userID) {
-		res.redirect("/login");
-	} else {
+	if (req.session.userID) {
 		urlsToDisplay = urlsOfUser(urlDatabase, req.session.userID.id);
-		const templateVars = {
-			shortURL: req.params.shortURL,
-			longURL: urlsToDisplay[req.params.shortURL]["longURL"],
-			user: req.session.userID,
-		};
-		res.render("urls_show", templateVars);
+		if (urlsToDisplay[req.params.shortURL] !== undefined) {
+			const templateVars = {
+				shortURL: req.params.shortURL,
+				longURL: urlsToDisplay[req.params.shortURL]["longURL"],
+				user: req.session.userID,
+			};
+			res.render("urls_show", templateVars);
+		} else {
+			res.status(404).send("this is not your shortURL page");
+		}
+	} else {
+		res.status(400).send("please login")
 	}
 });
 
@@ -231,7 +235,7 @@ app.post("/urls/:shortURL/edit", (req, res) => {
 /* deletes shortURL from urlDatabase */
 app.post("/urls/:shortURL/delete", (req, res) => {
 	if(!req.session.userID) {
-		res.status(400).send("Please login");
+		res.status(400).send("Please go to /login");
 	} else {
 		urlsToDisplay = urlsOfUser(urlDatabase, req.session.userID.id);
 		if (urlsToDisplay[req.params.shortURL] !== undefined) {
