@@ -209,7 +209,7 @@ app.get("/urls/:shortURL/edit", (req, res) => {
 /* posts edit to main URLs page */
 app.post("/urls/:shortURL/edit", (req, res) => {
 	if (!req.session.userID) {
-		res.redirect("/login");
+		res.status(400).send("Please go to /login");
 	} else {
 		urlsToDisplay = urlsOfUser(urlDatabase, req.session.userID.id);
 		if (urlsToDisplay[req.params.shortURL] !== undefined) {
