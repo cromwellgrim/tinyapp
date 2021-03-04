@@ -46,7 +46,11 @@ let urlDatabase = {
 
 /* redirect to urls or login (if not logged in) */
 app.get("/", (req, res) => {
+	if (req.session.userID){
 	res.redirect("/urls");
+	} else {
+		res.redirect("/login");
+	}
 });
 
 /* if user is not logged in go to login, otherwise show their database */
