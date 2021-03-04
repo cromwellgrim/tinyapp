@@ -103,9 +103,13 @@ app.post("/login", (req, res) => {
 
 /* brings up the register page */
 app.get("/register", (req, res) => {
+	if (req.session.userID !== undefined) {
+		res.redirect("/urls");
+	} else {
 	const activeUser = req.session.userID;
 	const templateVars = { urls: urlDatabase, user: activeUser };
 	res.render("register", templateVars);
+	}
 });
 
 /* checks to see if an email is in use before registering user */
