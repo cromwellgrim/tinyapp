@@ -218,6 +218,8 @@ app.post("/urls/:shortURL/edit", (req, res) => {
 			const longURL = req.body.longURL;
 			urlDatabase[shortURL] = { longURL: longURL, userID: userID };
 			res.redirect("/urls");
+		} else {
+			res.status(400).send("Please only change your shortURL");
 		}
 	}
 });
